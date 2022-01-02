@@ -42,17 +42,4 @@ class Todo extends Equatable {
         isCompleted,
         isCancelled,
       ];
-
-  static List<Todo> todos = [
-    Todo(
-      id: '1',
-      task: 'BloC Pattern Video',
-      description: 'Explain what is the BloC Pattern',
-    ),
-    Todo(
-      id: '2',
-      task: 'BloC Pattern Video #2',
-      description: 'Explain what is the BloC Pattern',
-    ),
-  ];
 }

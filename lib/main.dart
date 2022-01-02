@@ -4,9 +4,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '/blocs/blocs.dart';
 import '/models/models.dart';
 import '/screens/screens.dart';
+import 'simple_bloc_observer.dart';
 
 void main() {
-  runApp(const MyApp());
+  BlocOverrides.runZoned(
+    () {
+      runApp(const MyApp());
+    },
+    blocObserver: SimpleBlocObserver(),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -36,15 +42,9 @@ class MyApp extends StatelessWidget {
             ),
         ),
         BlocProvider(
-          create: (context) => TodosCounterBloc(
+          create: (context) => TodosStatusBloc(
             todosBloc: BlocProvider.of<TodosBloc>(context),
-          )..add(
-              LoadTodosCounter(
-                  initialValue:
-                      (BlocProvider.of<TodosBloc>(context).state as TodosLoaded)
-                          .todos
-                          .length),
-            ),
+          )..add(UpdateTodosStatus()),
         ),
       ],
       child: MaterialApp(

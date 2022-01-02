@@ -27,56 +27,29 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<TodosBloc, TodosState>(
+      body: BlocBuilder<TodosStatusBloc, TodosStatusState>(
         builder: (context, state) {
-          if (state is TodosLoading) {
+          if (state is TodosStatusLoading) {
             return const Center(
               child: CircularProgressIndicator(),
             );
           }
-          if (state is TodosLoaded) {
-            return Column(
-              children: [
-                ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: state.todos.length,
-                  itemBuilder: (BuildContext context, int index) {
-                    return _todosCard(
-                      context,
-                      state.todos[index],
-                      index,
-                    );
-                  },
-                ),
-                const SizedBox(height: 200),
-                const Text(
-                  '# of Active To Dos',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
+          if (state is TodosStatusLoaded) {
+            return Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _todo(
+                    state.pendingTodos,
+                    'Pending',
                   ),
-                ),
-                const SizedBox(height: 10),
-                BlocBuilder<TodosCounterBloc, TodosCounterState>(
-                  builder: (context, state) {
-                    if (state is TodosCounterLoading) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    }
-                    if (state is TodosCounterLoaded) {
-                      return Text(
-                        '${state.todosCount}',
-                        style: const TextStyle(
-                          fontSize: 18,
-                        ),
-                      );
-                    } else {
-                      return const Text('Something went wrong.');
-                    }
-                  },
-                ),
-              ],
+                  _todo(
+                    state.completedTodos,
+                    'Completed',
+                  ),
+                ],
+              ),
             );
           } else {
             return const Text('Something went wrong.');
@@ -86,12 +59,43 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
+  Column _todo(List<Todo> todos, String status) {
+    return Column(
+      children: [
+        SizedBox(
+          height: 50,
+          child: Row(
+            children: [
+              Text(
+                '$status To Dos: ',
+                style: const TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        ),
+        ListView.builder(
+          shrinkWrap: true,
+          itemCount: todos.length,
+          itemBuilder: (BuildContext context, int index) {
+            return _todosCard(
+              context,
+              todos[index],
+            );
+          },
+        ),
+      ],
+    );
+  }
+
   Card _todosCard(
     BuildContext context,
     Todo todo,
-    int index,
   ) {
     return Card(
+      margin: const EdgeInsets.only(bottom: 8.0),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: Row(
@@ -104,31 +108,33 @@ class HomeScreen extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
-            Row(
-              children: [
-                IconButton(
-                  onPressed: () {
-                    context.read<TodosBloc>().add(
-                          UpdateTodo(
-                            index: index,
-                            todo: todo.copyWith(isCompleted: true),
-                          ),
-                        );
-                  },
-                  icon: const Icon(Icons.add_task),
-                ),
-                IconButton(
-                  onPressed: () {
-                    context.read<TodosBloc>().add(
-                          UpdateTodo(
-                            index: index,
-                            todo: todo.copyWith(isCancelled: true),
-                          ),
-                        );
-                  },
-                  icon: const Icon(Icons.cancel),
-                ),
-              ],
+            BlocBuilder<TodosBloc, TodosState>(
+              builder: (context, state) {
+                return Row(
+                  children: [
+                    IconButton(
+                      onPressed: () {
+                        context.read<TodosBloc>().add(
+                              UpdateTodo(
+                                todo: todo.copyWith(isCompleted: true),
+                              ),
+                            );
+                      },
+                      icon: const Icon(Icons.add_task),
+                    ),
+                    IconButton(
+                      onPressed: () {
+                        context.read<TodosBloc>().add(
+                              DeleteTodo(
+                                todo: todo.copyWith(isCancelled: true),
+                              ),
+                            );
+                      },
+                      icon: const Icon(Icons.cancel),
+                    ),
+                  ],
+                );
+              },
             ),
           ],
         ),

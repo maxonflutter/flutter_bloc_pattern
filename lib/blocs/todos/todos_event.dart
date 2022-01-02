@@ -30,16 +30,14 @@ class AddTodo extends TodoEvent {
 }
 
 class UpdateTodo extends TodoEvent {
-  final int index;
   final Todo todo;
 
   const UpdateTodo({
-    required this.index,
     required this.todo,
   });
 
   @override
-  List<Object> get props => [index, todo];
+  List<Object> get props => [todo];
 }
 
 class DeleteTodo extends TodoEvent {
