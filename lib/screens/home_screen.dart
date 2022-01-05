@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_pattern/blocs/todos/todos_bloc.dart';
+import 'package:flutter_bloc_pattern/blocs/todos_filter/todos_filter_bloc.dart';
 
 import '/models/models.dart';
 import '/screens/screens.dart';
@@ -28,12 +29,12 @@ class HomeScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: BlocBuilder<TodosBloc, TodosState>(
+      body: BlocBuilder<TodosFilterBloc, TodosFilterState>(
         builder: (context, state) {
-          if (state is TodosLoading) {
+          if (state is TodosFilterLoading) {
             return const CircularProgressIndicator();
           }
-          if (state is TodosLoaded) {
+          if (state is TodosFilterLoaded) {
             return Padding(
               padding: const EdgeInsets.all(8.0),
               child: Column(
@@ -51,19 +52,56 @@ class HomeScreen extends StatelessWidget {
                   ),
                   ListView.builder(
                     shrinkWrap: true,
-                    itemCount: state.todos.length,
+                    itemCount: state.filteredTodos.length,
                     itemBuilder: (BuildContext context, int index) {
-                      return _todoCard(context, state.todos[index]);
+                      return _todoCard(context, state.filteredTodos[index]);
                     },
                   ),
                 ],
               ),
             );
           } else {
-            return const Text('Something went wrong!');
+            return const Text('Something went wrong.');
           }
         },
       ),
+
+      // BlocBuilder<TodosBloc, TodosState>(
+      //   builder: (context, state) {
+      //     if (state is TodosLoading) {
+      //       return const CircularProgressIndicator();
+      //     }
+      //     if (state is TodosLoaded) {
+      //       return Padding(
+      //         padding: const EdgeInsets.all(8.0),
+      //         child: Column(
+      //           crossAxisAlignment: CrossAxisAlignment.start,
+      //           children: [
+      //             Container(
+      //               padding: const EdgeInsets.all(8.0),
+      //               child: const Text(
+      //                 'Pending To Dos: ',
+      //                 style: TextStyle(
+      //                   fontSize: 18,
+      //                   fontWeight: FontWeight.bold,
+      //                 ),
+      //               ),
+      //             ),
+      //             ListView.builder(
+      //               shrinkWrap: true,
+      //               itemCount: state.todos.length,
+      //               itemBuilder: (BuildContext context, int index) {
+      //                 return _todoCard(context, state.todos[index]);
+      //               },
+      //             ),
+      //           ],
+      //         ),
+      //       );
+      //     } else {
+      //       return const Text('Something went wrong!');
+      //     }
+      //   },
+      // ),
     );
   }
 
