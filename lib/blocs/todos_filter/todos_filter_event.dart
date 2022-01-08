@@ -17,7 +17,9 @@ class UpdateFilter extends TodosFilterEvent {
 class UpdateTodos extends TodosFilterEvent {
   final TodosFilter todosFilter;
 
-  const UpdateTodos({required this.todosFilter});
+  const UpdateTodos({
+    this.todosFilter = TodosFilter.all,
+  });
 
   @override
   List<Object> get props => [todosFilter];

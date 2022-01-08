@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_bloc_pattern/blocs/todos/todos_bloc.dart';
-import 'package:flutter_bloc_pattern/blocs/todos_filter/todos_filter_bloc.dart';
-import 'package:flutter_bloc_pattern/models/todos_filter_model.dart';
 
 import '/models/models.dart';
 import '/screens/screens.dart';
@@ -16,60 +14,74 @@ class HomeScreen extends StatelessWidget {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        appBar: AppBar(
-          title: const Text('BloC Pattern: To Dos'),
-          actions: [
-            IconButton(
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const AddTodoScreen(),
-                  ),
-                );
-              },
-              icon: const Icon(Icons.add),
-            ),
-          ],
-          bottom: TabBar(
-            onTap: (tabIndex) {
-              switch (tabIndex) {
-                case 0:
-                  BlocProvider.of<TodosFilterBloc>(context).add(
-                    UpdateTodos(
-                      todosFilter: TodosFilter.pending,
+          appBar: AppBar(
+            title: const Text('BloC Pattern: To Dos'),
+            actions: [
+              IconButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const AddTodoScreen(),
                     ),
                   );
-                  break;
-                case 1:
-                  BlocProvider.of<TodosFilterBloc>(context).add(
-                    UpdateTodos(
-                      todosFilter: TodosFilter.completed,
-                    ),
-                  );
-                  break;
-              }
-            },
-            tabs: const [
-              Tab(icon: Icon(Icons.pending)),
-              Tab(icon: Icon(Icons.add_task)),
+                },
+                icon: const Icon(Icons.add),
+              ),
             ],
+            bottom: TabBar(
+                onTap: (tabIndex) {
+                  switch (tabIndex) {
+                    case 0:
+                      BlocProvider.of<TodosFilterBloc>(context).add(
+                        const UpdateTodos(
+                          todosFilter: TodosFilter.pending,
+                        ),
+                      );
+                      break;
+                    case 1:
+                      BlocProvider.of<TodosFilterBloc>(context).add(
+                        const UpdateTodos(
+                          todosFilter: TodosFilter.completed,
+                        ),
+                      );
+                      break;
+                  }
+                },
+                tabs: const [
+                  Tab(
+                    icon: Icon(
+                      Icons.pending,
+                    ),
+                  ),
+                  Tab(
+                    icon: Icon(
+                      Icons.add_task,
+                    ),
+                  ),
+                ]),
           ),
-        ),
-        body: TabBarView(
-          children: [
-            _todos('Pending To Dos'),
-            _todos('Completed To Dos'),
-          ],
-        ),
-      ),
+          body: TabBarView(
+            children: [
+              _todos('Pending To Dos'),
+              _todos('Completed To Dos'),
+            ],
+          )),
     );
   }
 
-  BlocBuilder<TodosFilterBloc, TodosFilterState> _todos(
-    String title,
-  ) {
-    return BlocBuilder<TodosFilterBloc, TodosFilterState>(
+  BlocConsumer<TodosFilterBloc, TodosFilterState> _todos(String title) {
+    return BlocConsumer<TodosFilterBloc, TodosFilterState>(
+      listener: (context, state) {
+        if (state is TodosFilterLoaded) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                  'You have ${state.filteredTodos.length} To Dos in the ${state.todosFilter.toString().split('.').last} list'),
+            ),
+          );
+        }
+      },
       builder: (context, state) {
         if (state is TodosFilterLoading) {
           return const CircularProgressIndicator();
@@ -101,7 +113,7 @@ class HomeScreen extends StatelessWidget {
             ),
           );
         } else {
-          return const Text('Something went wrong!');
+          return const Text('Something went wrong.');
         }
       },
     );

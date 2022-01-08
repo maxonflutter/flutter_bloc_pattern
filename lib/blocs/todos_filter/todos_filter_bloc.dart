@@ -34,7 +34,8 @@ class TodosFilterBloc extends Bloc<TodosFilterEvent, TodosFilterState> {
     }
 
     if (state is TodosFilterLoaded) {
-      final state = (this.state as TodosFilterLoaded);
+      final state = this.state as TodosFilterLoaded;
+
       add(
         UpdateTodos(todosFilter: state.todosFilter),
       );
@@ -65,11 +66,5 @@ class TodosFilterBloc extends Bloc<TodosFilterEvent, TodosFilterState> {
         ),
       );
     }
-  }
-
-  @override
-  Future<void> close() {
-    _todosSubscription.cancel();
-    return super.close();
   }
 }
