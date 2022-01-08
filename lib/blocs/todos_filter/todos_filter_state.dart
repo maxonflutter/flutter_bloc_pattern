@@ -4,7 +4,7 @@ abstract class TodosFilterState extends Equatable {
   const TodosFilterState();
 
   @override
-  List<Object> get props => [];
+  List<Object?> get props => [];
 }
 
 class TodosFilterLoading extends TodosFilterState {}
@@ -15,9 +15,9 @@ class TodosFilterLoaded extends TodosFilterState {
 
   const TodosFilterLoaded({
     required this.filteredTodos,
-    this.todosFilter = TodosFilter.all,
+    this.todosFilter = TodosFilter.pending,
   });
 
   @override
-  List<Object> get props => [filteredTodos, todosFilter];
+  List<Object?> get props => [filteredTodos, todosFilter];
 }

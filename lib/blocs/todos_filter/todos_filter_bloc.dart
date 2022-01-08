@@ -4,6 +4,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:flutter_bloc_pattern/blocs/todos/todos_bloc.dart';
 import 'package:flutter_bloc_pattern/models/models.dart';
+import 'package:flutter_bloc_pattern/models/todos_filter_model.dart';
 
 part 'todos_filter_event.dart';
 part 'todos_filter_state.dart';
@@ -15,22 +16,32 @@ class TodosFilterBloc extends Bloc<TodosFilterEvent, TodosFilterState> {
   TodosFilterBloc({required TodosBloc todosBloc})
       : _todosBloc = todosBloc,
         super(TodosFilterLoading()) {
+    on<UpdateFilter>(_onUpdateFilter);
     on<UpdateTodos>(_onUpdateTodos);
 
     _todosSubscription = todosBloc.stream.listen((state) {
-      if (state is TodosLoaded) {
-        print(state.todos);
-        add(
-          const UpdateTodos(),
-        );
-      }
+      add(
+        const UpdateFilter(),
+      );
     });
   }
 
-  void _onUpdateTodos(
-    UpdateTodos event,
-    Emitter<TodosFilterState> emit,
-  ) {
+  void _onUpdateFilter(UpdateFilter event, Emitter<TodosFilterState> emit) {
+    if (state is TodosFilterLoading) {
+      add(
+        const UpdateTodos(todosFilter: TodosFilter.pending),
+      );
+    }
+
+    if (state is TodosFilterLoaded) {
+      final state = (this.state as TodosFilterLoaded);
+      add(
+        UpdateTodos(todosFilter: state.todosFilter),
+      );
+    }
+  }
+
+  void _onUpdateTodos(UpdateTodos event, Emitter<TodosFilterState> emit) {
     final state = _todosBloc.state;
 
     if (state is TodosLoaded) {
@@ -43,10 +54,10 @@ class TodosFilterBloc extends Bloc<TodosFilterEvent, TodosFilterState> {
           case TodosFilter.cancelled:
             return todo.isCancelled!;
           case TodosFilter.pending:
-            return !(todo.isCancelled! && todo.isCompleted!);
+            return !(todo.isCancelled! || todo.isCompleted!);
         }
       }).toList();
-      print(todos);
+
       emit(
         TodosFilterLoaded(
           filteredTodos: todos,

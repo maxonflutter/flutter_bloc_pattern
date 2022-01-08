@@ -42,5 +42,14 @@ class TodosBloc extends Bloc<TodosEvent, TodosState> {
     }
   }
 
-  void _onUpdateTodo(UpdateTodo event, Emitter<TodosState> emit) {}
+  void _onUpdateTodo(UpdateTodo event, Emitter<TodosState> emit) {
+    final state = this.state;
+    if (state is TodosLoaded) {
+      List<Todo> todos = (state.todos.map((todo) {
+        return todo.id == event.todo.id ? event.todo : todo;
+      })).toList();
+
+      emit(TodosLoaded(todos: todos));
+    }
+  }
 }
