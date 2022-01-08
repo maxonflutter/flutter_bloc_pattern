@@ -77,7 +77,7 @@ class HomeScreen extends StatelessWidget {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text(
-                  'You have ${state.filteredTodos.length} To Dos in the ${state.todosFilter.toString().split('.').last} list'),
+                  'There are ${state.filteredTodos.length} To Dos in your ${state.todosFilter.toString().split('.').last} list.'),
             ),
           );
         }
